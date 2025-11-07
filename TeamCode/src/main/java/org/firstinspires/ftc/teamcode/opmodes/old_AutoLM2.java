@@ -56,7 +56,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="Blue Auto for LM2", group="Auto")
-public class AutoLM2 extends LinearOpMode {
+@Disabled
+public class old_AutoLM2 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
