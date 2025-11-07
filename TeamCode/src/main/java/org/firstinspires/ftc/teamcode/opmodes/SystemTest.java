@@ -169,9 +169,9 @@ public class SystemTest extends LinearOpMode {
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             //axial = speed, lateral = turn, yaw = strafe
-            double axial = gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = -gamepad1.right_stick_x;
-            double yaw = -gamepad1.left_stick_x;
+            double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double lateral = gamepad1.left_stick_x;
+            double yaw = gamepad1.right_stick_x;
 
             // ONLY call this once per loop or you will see significant speed issues.
             double catapult1MotorCurrent = catapult1.getCurrent(CurrentUnit.AMPS);
@@ -248,7 +248,7 @@ public class SystemTest extends LinearOpMode {
                 footmode = FootMode.BRAKE;
                 foot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
-
+            /*
             // Determine pivot mode
             if (catapultDownButton) {
                 pivotMode = CatapultModes.DOWN;
@@ -262,7 +262,7 @@ public class SystemTest extends LinearOpMode {
                     catapult1.setPower(CATAPULT_UP_POWER);
                     catapult2.setPower(CATAPULT_UP_POWER);
                 } else if (pivotMode == CatapultModes.UP) {
-                    if (Math.abs(catapult1.getCurrentPosition()) < 50 || Math.abs(catapult2.getCurrentPosition()) < 50) {
+                    if (Math.abs(catapult1.getCurrentPosition()) < 120 || Math.abs(catapult2.getCurrentPosition()) < 135) {
                         pivotMode = CatapultModes.BRAKE;
 
                         catapult1.setPower(0);
@@ -270,7 +270,7 @@ public class SystemTest extends LinearOpMode {
                     }
                 }
             }
-
+*/
             if(gamepad1.dpad_up){
                 telemetry.addData("Drive Motor UT = ", "LeftFrontMotor");
                 lfPower = 1;
@@ -310,9 +310,11 @@ public class SystemTest extends LinearOpMode {
             telemetry.addData("Foot MODE", "%s", footmode);
             telemetry.addData("Catapult1 Current Draw: ",
                     (catapult1MotorCurrent + catapult2MotorCurrent) / 2.0);
+            telemetry.addData("Catapult 1 Encoder: ", catapult1.getCurrentPosition());
+            telemetry.addData("Catapult 2 Encoder: ", catapult2.getCurrentPosition());
             telemetry.addData("Catapult MODE", "%s", pivotMode);
             telemetry.update();
         }
-    }
+    } // 120, -125
 }
 

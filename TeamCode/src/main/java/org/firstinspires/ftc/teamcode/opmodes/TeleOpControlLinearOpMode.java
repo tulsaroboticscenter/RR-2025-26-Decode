@@ -98,7 +98,7 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
     private double footPower = FOOT_OFF_POWER;
 
     private double CATAPULT_UP_POWER         = -1.0;
-    private double CATAPULT_DOWN_POWER       = 0.5;
+    private double CATAPULT_DOWN_POWER       = 1;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
 
     private enum CatapultModes {
@@ -190,9 +190,9 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             //axial = speed, lateral = turn, yaw = strafe
-            double axial = gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = -gamepad1.right_stick_x;
-            double yaw = -gamepad1.left_stick_x;
+            double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double lateral = gamepad1.left_stick_x;
+            double yaw = gamepad1.right_stick_x;
 
             // ONLY call this once per loop or you will see significant speed issues.
             double catapult1MotorCurrent = catapult1.getCurrent(CurrentUnit.AMPS);
@@ -283,8 +283,8 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
                     catapult1.setPower(CATAPULT_UP_POWER);
                     catapult2.setPower(CATAPULT_UP_POWER);
                 } else if (pivotMode == CatapultModes.UP) {
-                    if (Math.abs(catapult1.getCurrentPosition()) < 50 || Math.abs(catapult2.getCurrentPosition()) < 50) {
-                        pivotMode = CatapultModes.BRAKE;
+                    if (Math.abs(catapult1.getCurrentPosition()) < 25 || Math.abs(catapult2.getCurrentPosition()) < 25) {
+                        // pivotMode = CatapultModes.BRAKE;
 
                         catapult1.setPower(0);
                         catapult2.setPower(0);
@@ -311,6 +311,8 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
             telemetry.addData("Foot MODE", "%s", footmode);
             telemetry.addData("Catapult1 Current Draw: ",
                     (catapult1MotorCurrent + catapult2MotorCurrent) / 2.0);
+            telemetry.addData("Catapult 1 Encoder: ", catapult1.getCurrentPosition());
+            telemetry.addData("Catapult 2 Encoder: ", catapult2.getCurrentPosition());
             telemetry.addData("Catapult MODE", "%s", pivotMode);
             telemetry.update();
         }
