@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Auto for LM2", group="Auto")
+@Autonomous(name="Red Auto", group="Auto")
 public class AutoLM2_red extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
@@ -176,12 +176,12 @@ public class AutoLM2_red extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Drive slightly away from the wall
-            leftFrontDrive.setPower(0.5);
-            rightFrontDrive.setPower(0.5);
-            leftBackDrive.setPower(0.5);
-            rightBackDrive.setPower(0.5);
+            leftFrontDrive.setPower(-0.5);
+            rightFrontDrive.setPower(-0.5);
+            leftBackDrive.setPower(-0.5);
+            rightBackDrive.setPower(-0.5);
 
-            sleep(500);
+            sleep(250);
 
             // Stop the robot
             leftFrontDrive.setPower(0);
@@ -221,7 +221,7 @@ public class AutoLM2_red extends LinearOpMode {
             rightBackDrive.setPower(0.5);
             rightFrontDrive.setPower(0.5);
 
-            sleep(1000);
+            sleep(500);
 
             // stop the robot
             leftBackDrive.setPower(0);
@@ -231,6 +231,7 @@ public class AutoLM2_red extends LinearOpMode {
 
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
+            requestOpModeStop();
         }
 
     }

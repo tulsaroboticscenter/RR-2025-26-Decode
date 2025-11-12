@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -55,9 +54,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Auto for LM2", group="Auto")
-@Disabled
-public class old_AutoLM2 extends LinearOpMode {
+@Autonomous(name="Far Zone Auto", group="Auto")
+public class FarZoneAuto extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -177,62 +175,24 @@ public class old_AutoLM2 extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            // Drive slightly away from the wall
-            leftFrontDrive.setPower(0.5);
-            rightFrontDrive.setPower(0.5);
-            leftBackDrive.setPower(0.5);
-            rightBackDrive.setPower(0.5);
+            // Drive off the line
+            leftFrontDrive.setPower(1);
+            rightFrontDrive.setPower(1);
+            leftBackDrive.setPower(1);
+            rightBackDrive.setPower(1);
 
+            // Wait
             sleep(500);
 
-            // Stop the robot
+            // Stop everything
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
             leftBackDrive.setPower(0);
             rightBackDrive.setPower(0);
-
-            // Drop the catapult down
-            catapult1.setPower(CATAPULT_DOWN_POWER);
-            catapult2.setPower(CATAPULT_DOWN_POWER);
-
-            sleep(1000);
-
-            // launch the artifacts
-            catapult1.setPower(CATAPULT_UP_POWER);
-            catapult2.setPower(CATAPULT_UP_POWER);
-
-            sleep(500);
-
-            // shut the catapult off
-            catapult1.setPower(0);
-            catapult2.setPower(0);
-
-
-            // drive off the line
-            // rotate 90 degrees
-            leftBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(-0.5);
-            rightFrontDrive.setPower(-0.5);
-
-            sleep(1000);
-
-            // Drive forward
-            leftBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(0.5);
-            rightFrontDrive.setPower(0.5);
-
-            sleep(1000);
-
-            // stop the robot
-            leftBackDrive.setPower(0);
-            leftFrontDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            rightFrontDrive.setPower(0);
 
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
+            requestOpModeStop();
         }
 
     }
