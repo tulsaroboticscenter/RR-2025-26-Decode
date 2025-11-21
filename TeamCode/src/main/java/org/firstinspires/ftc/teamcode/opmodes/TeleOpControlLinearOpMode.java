@@ -66,7 +66,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
  */
 
 // Based on the sample: Basic: Omni Linear OpMode
-@TeleOp(name = "TeleOp Control", group = "Teleop")
+@TeleOp(name = "TeleOp", group = "Teleop")
 
 public class TeleOpControlLinearOpMode extends LinearOpMode {
 
@@ -283,7 +283,7 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
                     catapult1.setPower(CATAPULT_UP_POWER);
                     catapult2.setPower(CATAPULT_UP_POWER);
                 } else if (pivotMode == CatapultModes.UP) {
-                    if (Math.abs(catapult1.getCurrentPosition()) < 25 || Math.abs(catapult2.getCurrentPosition()) < 25) {
+                    if (Math.abs(catapult1.getCurrentPosition()) < 10 || Math.abs(catapult2.getCurrentPosition()) < 10) {
                         // pivotMode = CatapultModes.BRAKE;
 
                         catapult1.setPower(0);
@@ -309,8 +309,8 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
             telemetry.addData("Intake", "%%4.2f", intake.getPower());
             telemetry.addData("Foot Power", "%4.2f", foot.getPower());
             telemetry.addData("Foot MODE", "%s", footmode);
-            telemetry.addData("Catapult1 Current Draw: ",
-                    (catapult1MotorCurrent + catapult2MotorCurrent) / 2.0);
+            telemetry.addData("Catapult1 Current Draw: ", (catapult1MotorCurrent));
+            telemetry.addData("Catapult2 Current Draw: ", (catapult2MotorCurrent));
             telemetry.addData("Catapult 1 Encoder: ", catapult1.getCurrentPosition());
             telemetry.addData("Catapult 2 Encoder: ", catapult2.getCurrentPosition());
             telemetry.addData("Catapult MODE", "%s", pivotMode);

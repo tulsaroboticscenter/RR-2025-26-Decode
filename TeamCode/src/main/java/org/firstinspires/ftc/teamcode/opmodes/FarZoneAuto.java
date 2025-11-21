@@ -176,10 +176,10 @@ public class FarZoneAuto extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Drive off the line
-            leftFrontDrive.setPower(1);
-            rightFrontDrive.setPower(1);
-            leftBackDrive.setPower(1);
-            rightBackDrive.setPower(1);
+            leftFrontDrive.setPower(0.5);
+            rightFrontDrive.setPower(0.5);
+            leftBackDrive.setPower(0.5);
+            rightBackDrive.setPower(0.5);
 
             // Wait
             sleep(500);
