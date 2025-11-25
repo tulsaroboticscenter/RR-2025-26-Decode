@@ -86,7 +86,7 @@ public class AutoLM2 extends LinearOpMode {
     private double footPower = FOOT_OFF_POWER;
 
     private double CATAPULT_UP_POWER         = -1.0;
-    private double CATAPULT_DOWN_POWER       = 0.5;
+    private double CATAPULT_DOWN_POWER       = 1.0;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
 
     private enum CatapultModes {
