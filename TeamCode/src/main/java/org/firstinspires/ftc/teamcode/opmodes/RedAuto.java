@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="Red Auto", group="Auto")
-public class AutoLM2_red extends LinearOpMode {
+public class RedAuto extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();

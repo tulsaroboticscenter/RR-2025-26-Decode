@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -55,8 +54,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Auto", group="Auto")
-public class AutoLM2 extends LinearOpMode {
+@Autonomous(name="in progress auto", group="Auto")
+public class NewBlueAuto extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -157,7 +156,7 @@ public class AutoLM2 extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // set direction of subsystem motors
-        intake.setDirection(DcMotor.Direction.FORWARD); // Forward should INTAKE.
+        intake.setDirection(DcMotor.Direction.REVERSE);
         catapult1.setDirection(DcMotor.Direction.FORWARD); // Backwards should pivot DOWN, or in the stowed position.
         catapult2.setDirection(DcMotor.Direction.REVERSE);
         foot.setDirection(DcMotor.Direction.REVERSE); // Backwards should should stay UP, or in the stowed position
@@ -184,7 +183,6 @@ public class AutoLM2 extends LinearOpMode {
 
             sleep(250);
 
-
             // Stop the robot
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
@@ -207,15 +205,24 @@ public class AutoLM2 extends LinearOpMode {
             catapult1.setPower(0);
             catapult2.setPower(0);
 
+            // drive back
+            leftFrontDrive.setPower(-1);
+            rightFrontDrive.setPower(-1);
+            leftBackDrive.setPower(-1);
+            rightBackDrive.setPower(-1);
 
-            // drive off the line
-            // rotate 90 degrees
-            leftBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(-0.5);
-            rightFrontDrive.setPower(-0.5);
+            sleep(850);
 
-            sleep(1000);
+            // rotate
+            leftBackDrive.setPower(-1);
+            leftFrontDrive.setPower(-1);
+            rightBackDrive.setPower(1);
+            rightFrontDrive.setPower(1);
+
+            sleep(175);
+
+            // intake on
+            intake.setPower(INTAKE_IN_POWER);
 
             // Drive forward
             leftBackDrive.setPower(0.5);
@@ -223,16 +230,18 @@ public class AutoLM2 extends LinearOpMode {
             rightBackDrive.setPower(0.5);
             rightFrontDrive.setPower(0.5);
 
-            sleep(500);
+            sleep(2000);
 
             // stop the robot
             leftBackDrive.setPower(0);
             leftFrontDrive.setPower(0);
             rightBackDrive.setPower(0);
             rightFrontDrive.setPower(0);
+            intake.setPower(INTAKE_OFF_POWER);
 
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
+
             requestOpModeStop();
         }
 

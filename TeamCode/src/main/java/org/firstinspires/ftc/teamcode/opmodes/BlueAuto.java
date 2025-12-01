@@ -54,8 +54,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Far Zone Auto", group="Auto")
-public class FarZoneAuto extends LinearOpMode {
+@Autonomous(name="Blue Auto", group="Auto")
+public class BlueAuto extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -85,7 +85,7 @@ public class FarZoneAuto extends LinearOpMode {
     private double footPower = FOOT_OFF_POWER;
 
     private double CATAPULT_UP_POWER         = -1.0;
-    private double CATAPULT_DOWN_POWER       = 0.5;
+    private double CATAPULT_DOWN_POWER       = 1.0;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
 
     private enum CatapultModes {
@@ -175,20 +175,60 @@ public class FarZoneAuto extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            // Drive off the line
-            leftFrontDrive.setPower(0.5);
-            rightFrontDrive.setPower(0.5);
-            leftBackDrive.setPower(0.5);
-            rightBackDrive.setPower(0.5);
+            // Drive slightly away from the wall
+            leftFrontDrive.setPower(-0.5);
+            rightFrontDrive.setPower(-0.5);
+            leftBackDrive.setPower(-0.5);
+            rightBackDrive.setPower(-0.5);
 
-            // Wait
-            sleep(600);
+            sleep(250);
 
-            // Stop everything
+
+            // Stop the robot
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
             leftBackDrive.setPower(0);
             rightBackDrive.setPower(0);
+
+            // Drop the catapult down
+            catapult1.setPower(CATAPULT_DOWN_POWER);
+            catapult2.setPower(CATAPULT_DOWN_POWER);
+
+            sleep(1000);
+
+            // launch the artifacts
+            catapult1.setPower(CATAPULT_UP_POWER);
+            catapult2.setPower(CATAPULT_UP_POWER);
+
+            sleep(500);
+
+            // shut the catapult off
+            catapult1.setPower(0);
+            catapult2.setPower(0);
+
+
+            // drive off the line
+            // rotate 90 degrees
+            leftBackDrive.setPower(0.5);
+            leftFrontDrive.setPower(0.5);
+            rightBackDrive.setPower(-0.5);
+            rightFrontDrive.setPower(-0.5);
+
+            sleep(1000);
+
+            // Drive forward
+            leftBackDrive.setPower(0.5);
+            leftFrontDrive.setPower(0.5);
+            rightBackDrive.setPower(0.5);
+            rightFrontDrive.setPower(0.5);
+
+            sleep(500);
+
+            // stop the robot
+            leftBackDrive.setPower(0);
+            leftFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            rightFrontDrive.setPower(0);
 
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();

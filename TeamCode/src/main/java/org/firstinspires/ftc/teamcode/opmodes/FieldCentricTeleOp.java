@@ -29,19 +29,49 @@
 
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+/*
+ * This file contains an example of a Linear "OpMode".
+ * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
+ * The names of OpModes appear on the menu of the FTC Driver Station.
+ * When a selection is made from the menu, the corresponding OpMode is executed.
+ *
+ * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
+ * This code will work with either a Mecanum-Drive or an X-Drive train.
+ * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
+ * Note that a Mecanum drive must display an X roller-pattern when viewed from above.
+ *
+ * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
+ *
+ * Holonomic drives provide the ability for the robot to move in three axes (directions) simultaneously.
+ * Each motion axis is controlled by one Joystick axis.
+ *
+ * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
+ * 2) Lateral:  Strafing right and left                     Left-joystick Right and Left
+ * 3) Yaw:      Rotating Clockwise and counter clockwise    Right-joystick Right and Left
+ *
+ * This code is written assuming that the right-side motors need to be reversed for the robot to drive forward.
+ * When you first test your robot, if it moves backward when you push the left stick forward, then you must flip
+ * the direction of all 4 motors (see code below).
+ *
+ * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
+ */
 
 // Based on the sample: Basic: Omni Linear OpMode
-@TeleOp(name = "System Test", group = "Test")
+@TeleOp(name = "unfinished", group = "Teleop")
 
-public class SystemTest extends LinearOpMode {
+public class FieldCentricTeleOp extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -74,11 +104,6 @@ public class SystemTest extends LinearOpMode {
     private double CATAPULT_DOWN_POWER       = 1.0;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
 
-    private double rrPower = 0;
-    private double lrPower = 0;
-    private double rfPower = 0;
-    private double lfPower = 0;
-
     private enum CatapultModes {
         UP("UP"), DOWN("DOWN"), BRAKE("BRAKE");
 
@@ -107,6 +132,11 @@ public class SystemTest extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intake = hardwareMap.get(DcMotor.class, "intake");
         catapult1 = hardwareMap.get(DcMotorEx.class, "catapult1");
@@ -138,11 +168,14 @@ public class SystemTest extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        // Retrieve the IMU from the hardware map
+        IMU imu = hardwareMap.get(IMU.class, "imu");
+        // Adjust the orientation parameters to match your robot
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
+        // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
+        imu.initialize(parameters);
 
         // set direction of subsystem motors
         intake.setDirection(DcMotor.Direction.FORWARD); // Forward should INTAKE.
@@ -169,9 +202,22 @@ public class SystemTest extends LinearOpMode {
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             //axial = speed, lateral = turn, yaw = strafe
-            double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x;
+            double rawAxial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double rawLateral = gamepad1.left_stick_x;
             double yaw = gamepad1.right_stick_x;
+
+            if (gamepad1.options) {
+                imu.resetYaw();
+            }
+
+            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+            // Rotate the movement direction counter to the bot's rotation
+            double lateral = rawLateral * Math.cos(-botHeading) - rawAxial * Math.sin(-botHeading);
+            double axial = rawLateral * Math.sin(-botHeading) + rawAxial * Math.cos(-botHeading);
+
+            lateral = lateral * 1.1;  // Counteract imperfect strafing
+
 
             // ONLY call this once per loop or you will see significant speed issues.
             double catapult1MotorCurrent = catapult1.getCurrent(CurrentUnit.AMPS);
@@ -196,10 +242,11 @@ public class SystemTest extends LinearOpMode {
             // DRIVE CODE
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower = axial - lateral + yaw;
-            double rightBackPower = axial + lateral - yaw;
+            double denominator = Math.max(Math.abs(axial) + Math.abs(lateral) + Math.abs(yaw), 1);
+            double leftFrontPower = (axial + lateral + yaw) / denominator;
+            double rightFrontPower = (axial - lateral - yaw) / denominator;
+            double leftBackPower = (axial - lateral + yaw) / denominator;
+            double rightBackPower = (axial + lateral - yaw) / denominator;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -214,19 +261,7 @@ public class SystemTest extends LinearOpMode {
                 rightBackPower /= max;
             }
 
-            // This is wheel test code
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
 
-/*            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad */
 
             // INTAKE CODE
             if (intakeInButton) {
@@ -248,7 +283,7 @@ public class SystemTest extends LinearOpMode {
                 footmode = FootMode.BRAKE;
                 foot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
-            /*
+
             // Determine pivot mode
             if (catapultDownButton) {
                 pivotMode = CatapultModes.DOWN;
@@ -262,40 +297,20 @@ public class SystemTest extends LinearOpMode {
                     catapult1.setPower(CATAPULT_UP_POWER);
                     catapult2.setPower(CATAPULT_UP_POWER);
                 } else if (pivotMode == CatapultModes.UP) {
-                    if (Math.abs(catapult1.getCurrentPosition()) < 120 || Math.abs(catapult2.getCurrentPosition()) < 135) {
-                        pivotMode = CatapultModes.BRAKE;
+                    if (Math.abs(catapult1.getCurrentPosition()) < 10 || Math.abs(catapult2.getCurrentPosition()) < 10) {
+                        // pivotMode = CatapultModes.BRAKE;
 
                         catapult1.setPower(0);
                         catapult2.setPower(0);
                     }
                 }
             }
-*/
-            if(gamepad1.dpad_up){
-                telemetry.addData("Drive Motor UT = ", "LeftFrontMotor");
-                lfPower = 1;
-            } else lfPower = 0;
-
-            if(gamepad1.dpad_down){
-                telemetry.addData("Drive Motor UT = ", "LeftBackMotor");
-                lrPower = 1;
-            } else lrPower = 0;
-
-            if(gamepad1.dpad_left){
-                telemetry.addData("Drive Motor UT = ", "RightFrontMotor");
-                rfPower = 1;
-            } else rfPower = 0;
-
-            if(gamepad1.dpad_right){
-                telemetry.addData("Drive Motor UT = ", "RightBackMotor");
-                rrPower = 1;
-            } else rrPower = 0;
 
             // WRITE EFFECTORS - Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower + lfPower);
-            rightFrontDrive.setPower(rightFrontPower + rfPower);
-            leftBackDrive.setPower(leftBackPower + lrPower);
-            rightBackDrive.setPower(rightBackPower + rrPower);
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
 
             intake.setPower(intakePower);
             foot.setPower(footPower);
@@ -308,13 +323,13 @@ public class SystemTest extends LinearOpMode {
             telemetry.addData("Intake", "%%4.2f", intake.getPower());
             telemetry.addData("Foot Power", "%4.2f", foot.getPower());
             telemetry.addData("Foot MODE", "%s", footmode);
-            telemetry.addData("Catapult1 Current Draw: ",
-                    (catapult1MotorCurrent + catapult2MotorCurrent) / 2.0);
+            telemetry.addData("Catapult1 Current Draw: ", (catapult1MotorCurrent));
+            telemetry.addData("Catapult2 Current Draw: ", (catapult2MotorCurrent));
             telemetry.addData("Catapult 1 Encoder: ", catapult1.getCurrentPosition());
             telemetry.addData("Catapult 2 Encoder: ", catapult2.getCurrentPosition());
             telemetry.addData("Catapult MODE", "%s", pivotMode);
             telemetry.update();
         }
-    } // 120, -125
+    }
 }
 

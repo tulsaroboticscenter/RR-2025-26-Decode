@@ -37,40 +37,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-/*
- * This file contains an example of a Linear "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When a selection is made from the menu, the corresponding OpMode is executed.
- *
- * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
- * This code will work with either a Mecanum-Drive or an X-Drive train.
- * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
- * Note that a Mecanum drive must display an X roller-pattern when viewed from above.
- *
- * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
- *
- * Holonomic drives provide the ability for the robot to move in three axes (directions) simultaneously.
- * Each motion axis is controlled by one Joystick axis.
- *
- * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
- * 2) Lateral:  Strafing right and left                     Left-joystick Right and Left
- * 3) Yaw:      Rotating Clockwise and counter clockwise    Right-joystick Right and Left
- *
- * This code is written assuming that the right-side motors need to be reversed for the robot to drive forward.
- * When you first test your robot, if it moves backward when you push the left stick forward, then you must flip
- * the direction of all 4 motors (see code below).
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
- */
-
-// Based on the sample: Basic: Omni Linear OpMode
-@TeleOp(name = "TeleOp", group = "Teleop")
+@TeleOp(name = "Bot Centric TeleOp", group = "Teleop")
 
 public class TeleOpControlLinearOpMode extends LinearOpMode {
-
-    // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
 
     // Declare drive motors
@@ -97,8 +66,8 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
     private double FOOT_OFF_POWER = 0.0;
     private double footPower = FOOT_OFF_POWER;
 
-    private double CATAPULT_UP_POWER         = -1.0;
-    private double CATAPULT_DOWN_POWER       = 1.0;
+    private double CATAPULT_UP_POWER = -1.0;
+    private double CATAPULT_DOWN_POWER = 1.0;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
 
     private enum CatapultModes {
@@ -114,16 +83,9 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
 
     private FootMode footmode;
 
-    /*
-     * Code to run ONCE when the driver hits INIT (same as previous year's init())
-     */
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
-
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
 
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
         leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
@@ -140,24 +102,11 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
         catapult2 = hardwareMap.get(DcMotorEx.class, "catapult2");
         foot = hardwareMap.get(DcMotor.class, "foot");
 
-        // reset both encoders, assuming they exist. This fork uses the encoders on both motors, so make sure they are plugged in!
         catapult1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         catapult1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         
         catapult2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         catapult2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed
-        // to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
 
         // set direction of wheel motors
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -166,7 +115,7 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // set direction of subsystem motors
-        intake.setDirection(DcMotor.Direction.FORWARD); // Forward should INTAKE.
+        intake.setDirection(DcMotor.Direction.REVERSE);
         catapult1.setDirection(DcMotor.Direction.FORWARD); // Backwards should pivot DOWN, or in the stowed position.
         catapult2.setDirection(DcMotor.Direction.REVERSE);
         foot.setDirection(DcMotor.Direction.REVERSE); // Backwards should should stay UP, or in the stowed position
@@ -234,20 +183,6 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
                 leftBackPower /= max;
                 rightBackPower /= max;
             }
-
-            // This is wheel test code
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
-
-/*            leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-            leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-            rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-            rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad */
 
             // INTAKE CODE
             if (intakeInButton) {
@@ -318,4 +253,3 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
         }
     }
 }
-

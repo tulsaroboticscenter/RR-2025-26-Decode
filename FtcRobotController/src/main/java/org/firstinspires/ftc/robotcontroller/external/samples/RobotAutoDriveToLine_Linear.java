@@ -62,8 +62,7 @@ import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 @Autonomous(name="Robot: Auto Drive To Line", group="Robot")
 @Disabled
-public class
-RobotAutoDriveToLine_Linear extends LinearOpMode {
+public class RobotAutoDriveToLine_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor         leftDrive   = null;
