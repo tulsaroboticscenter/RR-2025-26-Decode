@@ -211,7 +211,7 @@ public class NewBlueAuto extends LinearOpMode {
             leftBackDrive.setPower(-1);
             rightBackDrive.setPower(-1);
 
-            sleep(850);
+            sleep(900);
 
             // rotate
             leftBackDrive.setPower(-1);
@@ -225,12 +225,12 @@ public class NewBlueAuto extends LinearOpMode {
             intake.setPower(INTAKE_IN_POWER);
 
             // Drive forward
-            leftBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(0.5);
-            rightFrontDrive.setPower(0.5);
+            leftBackDrive.setPower(0.75);
+            leftFrontDrive.setPower(0.75);
+            rightBackDrive.setPower(0.75);
+            rightFrontDrive.setPower(0.75);
 
-            sleep(2000);
+            sleep(1750);
 
             // stop the robot
             leftBackDrive.setPower(0);
@@ -238,6 +238,14 @@ public class NewBlueAuto extends LinearOpMode {
             rightBackDrive.setPower(0);
             rightFrontDrive.setPower(0);
             intake.setPower(INTAKE_OFF_POWER);
+
+            // back up to get more artifacts
+            leftBackDrive.setPower(-0.75);
+            leftFrontDrive.setPower(-0.75);
+            rightBackDrive.setPower(-0.75);
+            rightFrontDrive.setPower(-0.75);
+
+            sleep(500);
 
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
