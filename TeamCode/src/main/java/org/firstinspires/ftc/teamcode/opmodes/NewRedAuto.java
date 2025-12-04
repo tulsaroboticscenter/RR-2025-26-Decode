@@ -54,8 +54,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Auto (3 artifact)", group="Auto")
-public class BlueAuto extends LinearOpMode {
+@Autonomous(name="IN PROGRESS Red Auto (6 artifact)", group="Auto")
+public class NewRedAuto extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -74,7 +74,7 @@ public class BlueAuto extends LinearOpMode {
 
     // motor power 1 = 100% and 0.5 = 50%
     // negative values = reverse ex: -0.5 = reverse 50%
-    private double INTAKE_IN_POWER = 1.0;
+    private double INTAKE_IN_POWER = 0.75;
     private double INTAKE_OUT_POWER = -0.9;
     private double INTAKE_OFF_POWER = 0.0;
     private double intakePower = INTAKE_OFF_POWER;
@@ -100,12 +100,6 @@ public class BlueAuto extends LinearOpMode {
     private enum FootMode {UP, DOWN, BRAKE}
 
     private FootMode footmode;
-
-    /*
-     * Code to run ONCE when the driver hits INIT (same as previous year's init())
-     */
-
-
 
     @Override
     public void runOpMode() {
@@ -156,7 +150,7 @@ public class BlueAuto extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // set direction of subsystem motors
-        intake.setDirection(DcMotor.Direction.FORWARD); // Forward should INTAKE.
+        intake.setDirection(DcMotor.Direction.REVERSE);
         catapult1.setDirection(DcMotor.Direction.FORWARD); // Backwards should pivot DOWN, or in the stowed position.
         catapult2.setDirection(DcMotor.Direction.REVERSE);
         foot.setDirection(DcMotor.Direction.REVERSE); // Backwards should should stay UP, or in the stowed position
@@ -183,7 +177,6 @@ public class BlueAuto extends LinearOpMode {
 
             sleep(250);
 
-
             // Stop the robot
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
@@ -206,23 +199,46 @@ public class BlueAuto extends LinearOpMode {
             catapult1.setPower(0);
             catapult2.setPower(0);
 
+            // drive back
+            leftFrontDrive.setPower(-1);
+            rightFrontDrive.setPower(-1);
+            leftBackDrive.setPower(-1);
+            rightBackDrive.setPower(-1);
 
-            // drive off the line
-            // rotate 90 degrees
-            leftBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(-0.5);
-            rightFrontDrive.setPower(-0.5);
+            sleep(800);
 
-            sleep(1000);
+            // brake briefly
+            leftBackDrive.setPower(0);
+            leftFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            sleep(100);
+
+            // rotate 1st
+            leftBackDrive.setPower(1);
+            leftFrontDrive.setPower(1);
+            rightBackDrive.setPower(-1);
+            rightFrontDrive.setPower(-1);
+
+            sleep(225);
+
+            // brake briefly
+            leftBackDrive.setPower(0);
+            leftFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            sleep(100);
+
+            // intake on
+            intake.setPower(0.7);
 
             // Drive forward
-            leftBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(0.5);
-            rightFrontDrive.setPower(0.5);
+            leftBackDrive.setPower(0.75);
+            leftFrontDrive.setPower(0.75);
+            rightBackDrive.setPower(0.75);
+            rightFrontDrive.setPower(0.75);
 
-            sleep(500);
+            sleep(1100);
 
             // stop the robot
             leftBackDrive.setPower(0);
@@ -230,8 +246,107 @@ public class BlueAuto extends LinearOpMode {
             rightBackDrive.setPower(0);
             rightFrontDrive.setPower(0);
 
+            sleep(2000);
+
+            // shut the intake off
+            intake.setPower(INTAKE_OFF_POWER);
+
+            // back up to go to the goal
+            leftBackDrive.setPower(-0.75);
+            leftFrontDrive.setPower(-0.75);
+            rightBackDrive.setPower(-0.75);
+            rightFrontDrive.setPower(-0.75);
+
+            sleep(900);
+
+            // brake briefly
+            leftBackDrive.setPower(0);
+            leftFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            sleep(100);
+
+            // rotate 2nd
+            leftBackDrive.setPower(-1);
+            leftFrontDrive.setPower(-1);
+            rightBackDrive.setPower(1);
+            rightFrontDrive.setPower(1);
+
+            sleep(175);
+
+            // brake briefly
+            leftBackDrive.setPower(0);
+            leftFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            sleep(100);
+
+            // drive to the goal
+            leftFrontDrive.setPower(1);
+            rightFrontDrive.setPower(1);
+            leftBackDrive.setPower(1);
+            rightBackDrive.setPower(1);
+
+            sleep(950);
+
+            // Stop the robot
+            leftFrontDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            leftBackDrive.setPower(0);
+            rightBackDrive.setPower(0);
+
+            sleep(500);
+
+            // rock stuck artifacts into the catapult
+            intake.setPower(0.9);
+            leftBackDrive.setPower(-0.75);
+            leftFrontDrive.setPower(-0.75);
+            rightBackDrive.setPower(-0.75);
+            rightFrontDrive.setPower(-0.75);
+            sleep(250);
+
+            // brake briefly
+            leftBackDrive.setPower(0);
+            leftFrontDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            sleep(250);
+
+            leftBackDrive.setPower(0.75);
+            leftFrontDrive.setPower(0.75);
+            rightBackDrive.setPower(0.75);
+            rightFrontDrive.setPower(0.75);
+            sleep(250);
+
+            // brake briefly
+            leftFrontDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            leftBackDrive.setPower(0);
+            rightBackDrive.setPower(0);
+            sleep(250);
+
+            // shut the intake off
+            intake.setPower(INTAKE_OFF_POWER);
+
+            // Drop the catapult down
+            catapult1.setPower(CATAPULT_DOWN_POWER);
+            catapult2.setPower(CATAPULT_DOWN_POWER);
+
+            sleep(1000);
+
+            // launch the artifacts
+            catapult1.setPower(CATAPULT_UP_POWER);
+            catapult2.setPower(CATAPULT_UP_POWER);
+
+            sleep(500);
+
+            // shut the catapult off
+            catapult1.setPower(0);
+            catapult2.setPower(0);
+
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
+
             requestOpModeStop();
         }
 
