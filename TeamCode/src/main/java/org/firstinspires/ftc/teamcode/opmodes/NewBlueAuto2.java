@@ -54,8 +54,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="IN PROGRESS Red Auto (6 artifact)", group="Auto")
-public class NewRedAuto extends LinearOpMode {
+@Autonomous(name="Blue Auto (6 artifact)", group="Auto")
+public class NewBlueAuto2 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -65,25 +65,18 @@ public class NewRedAuto extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-
-    // Declare end-effector members
     private DcMotor intake = null;
     private DcMotorEx catapult1 = null;
     private DcMotorEx catapult2 = null;
     private DcMotor foot = null;
-
-    // motor power 1 = 100% and 0.5 = 50%
-    // negative values = reverse ex: -0.5 = reverse 50%
     private double INTAKE_IN_POWER = 0.75;
     private double INTAKE_OUT_POWER = -0.9;
     private double INTAKE_OFF_POWER = 0.0;
     private double intakePower = INTAKE_OFF_POWER;
-
     private double FOOT_UP_POWER = 1.0;
     private double FOOT_DOWN_POWER = -0.85;
     private double FOOT_OFF_POWER = 0.0;
     private double footPower = FOOT_OFF_POWER;
-
     private double CATAPULT_UP_POWER         = -1.0;
     private double CATAPULT_DOWN_POWER       = 1.0;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
@@ -100,6 +93,62 @@ public class NewRedAuto extends LinearOpMode {
     private enum FootMode {UP, DOWN, BRAKE}
 
     private FootMode footmode;
+
+    // Declare move functions
+    private void moveForward(double power, long time) {
+        leftFrontDrive.setPower(power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(power);
+        sleep(time);
+    }
+
+    private void moveBackward(double power, long time) {
+        leftFrontDrive.setPower(-power);
+        rightFrontDrive.setPower(-power);
+        leftBackDrive.setPower(-power);
+        rightBackDrive.setPower(-power);
+        sleep(time);
+    }
+
+    private void turnLeft(double power, long time) {
+        leftFrontDrive.setPower(-power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(-power);
+        rightBackDrive.setPower(power);
+        sleep(time);
+    }
+
+    private void turnRight(double power, long time) {
+        leftFrontDrive.setPower(power);
+        rightFrontDrive.setPower(-power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(-power);
+        sleep(time);
+    }
+
+    private void brake(long time) {
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
+        sleep(time);
+    }
+
+    private void dropCatapult(long time) {
+        catapult1.setPower(CATAPULT_DOWN_POWER);
+        catapult2.setPower(CATAPULT_DOWN_POWER);
+        sleep(time);
+    }
+
+    private void launchCatapult(long time) {
+        catapult1.setPower(CATAPULT_UP_POWER);
+        catapult2.setPower(CATAPULT_UP_POWER);
+        sleep(500);
+        catapult1.setPower(0);
+        catapult2.setPower(0);
+        sleep(time);
+    }
 
     @Override
     public void runOpMode() {
@@ -131,18 +180,6 @@ public class NewRedAuto extends LinearOpMode {
         catapult2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         catapult2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed
-        // to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-
         // set direction of wheel motors
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -170,179 +207,59 @@ public class NewRedAuto extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Drive slightly away from the wall
-            leftFrontDrive.setPower(-0.5);
-            rightFrontDrive.setPower(-0.5);
-            leftBackDrive.setPower(-0.5);
-            rightBackDrive.setPower(-0.5);
+            moveBackward(0.5, 250);
+            brake(10);
 
-            sleep(250);
+            // Launch preloaded artifacts
+            dropCatapult(1000);
+            launchCatapult(10);
 
-            // Stop the robot
-            leftFrontDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            leftBackDrive.setPower(0);
-            rightBackDrive.setPower(0);
+            // Back up to get artifacts
+            moveBackward(1,800);
+            brake(100);
 
-            // Drop the catapult down
-            catapult1.setPower(CATAPULT_DOWN_POWER);
-            catapult2.setPower(CATAPULT_DOWN_POWER);
+            // First rotate left
+            turnLeft(1, 225);
+            brake(100);
 
-            sleep(1000);
+            // Intake on
+            intake.setPower(0.75);
 
-            // launch the artifacts
-            catapult1.setPower(CATAPULT_UP_POWER);
-            catapult2.setPower(CATAPULT_UP_POWER);
+            // Go towards the artifacts
+            moveForward(0.75, 1100);
+            brake(2000);
 
-            sleep(500);
+            // Intake off
+            intake.setPower(0);
 
-            // shut the catapult off
-            catapult1.setPower(0);
-            catapult2.setPower(0);
+            // Back up for the goal
+            moveBackward(0.75, 1000);
+            brake(100);
 
-            // drive back
-            leftFrontDrive.setPower(-1);
-            rightFrontDrive.setPower(-1);
-            leftBackDrive.setPower(-1);
-            rightBackDrive.setPower(-1);
+            // Second rotate right
+            turnRight(1, 175);
+            brake(100);
 
-            sleep(800);
+            // Move to the goal
+            moveForward(1, 950);
+            brake(500);
 
-            // brake briefly
-            leftBackDrive.setPower(0);
-            leftFrontDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            sleep(100);
-
-            // rotate 1st
-            leftBackDrive.setPower(1);
-            leftFrontDrive.setPower(1);
-            rightBackDrive.setPower(-1);
-            rightFrontDrive.setPower(-1);
-
-            sleep(225);
-
-            // brake briefly
-            leftBackDrive.setPower(0);
-            leftFrontDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            sleep(100);
-
-            // intake on
-            intake.setPower(0.7);
-
-            // Drive forward
-            leftBackDrive.setPower(0.75);
-            leftFrontDrive.setPower(0.75);
-            rightBackDrive.setPower(0.75);
-            rightFrontDrive.setPower(0.75);
-
-            sleep(1100);
-
-            // stop the robot
-            leftBackDrive.setPower(0);
-            leftFrontDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-
-            sleep(2000);
-
-            // shut the intake off
-            intake.setPower(INTAKE_OFF_POWER);
-
-            // back up to go to the goal
-            leftBackDrive.setPower(-0.75);
-            leftFrontDrive.setPower(-0.75);
-            rightBackDrive.setPower(-0.75);
-            rightFrontDrive.setPower(-0.75);
-
-            sleep(900);
-
-            // brake briefly
-            leftBackDrive.setPower(0);
-            leftFrontDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            sleep(100);
-
-            // rotate 2nd
-            leftBackDrive.setPower(-1);
-            leftFrontDrive.setPower(-1);
-            rightBackDrive.setPower(1);
-            rightFrontDrive.setPower(1);
-
-            sleep(175);
-
-            // brake briefly
-            leftBackDrive.setPower(0);
-            leftFrontDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            sleep(100);
-
-            // drive to the goal
-            leftFrontDrive.setPower(1);
-            rightFrontDrive.setPower(1);
-            leftBackDrive.setPower(1);
-            rightBackDrive.setPower(1);
-
-            sleep(950);
-
-            // Stop the robot
-            leftFrontDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            leftBackDrive.setPower(0);
-            rightBackDrive.setPower(0);
-
-            sleep(500);
-
-            // rock stuck artifacts into the catapult
+            // Rock stuck artifacts into the catapult
             intake.setPower(0.9);
-            leftBackDrive.setPower(-0.75);
-            leftFrontDrive.setPower(-0.75);
-            rightBackDrive.setPower(-0.75);
-            rightFrontDrive.setPower(-0.75);
-            sleep(250);
+            moveBackward(0.75, 250);
+            brake(250);
+            moveForward(0.75, 250);
+            brake(250);
+            intake.setPower(0);
 
-            // brake briefly
-            leftBackDrive.setPower(0);
-            leftFrontDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            sleep(250);
+            // Launch artifacts
+            dropCatapult(1000);
+            launchCatapult(10);
 
-            leftBackDrive.setPower(0.75);
-            leftFrontDrive.setPower(0.75);
-            rightBackDrive.setPower(0.75);
-            rightFrontDrive.setPower(0.75);
-            sleep(250);
-
-            // brake briefly
-            leftFrontDrive.setPower(0);
-            rightFrontDrive.setPower(0);
-            leftBackDrive.setPower(0);
-            rightBackDrive.setPower(0);
-            sleep(250);
-
-            // shut the intake off
-            intake.setPower(INTAKE_OFF_POWER);
-
-            // Drop the catapult down
-            catapult1.setPower(CATAPULT_DOWN_POWER);
-            catapult2.setPower(CATAPULT_DOWN_POWER);
-
-            sleep(1000);
-
-            // launch the artifacts
-            catapult1.setPower(CATAPULT_UP_POWER);
-            catapult2.setPower(CATAPULT_UP_POWER);
-
-            sleep(500);
-
-            // shut the catapult off
-            catapult1.setPower(0);
-            catapult2.setPower(0);
+            // Drive off the line
+            turnLeft(1, 350);
+            brake(100);
+            moveBackward(0.5, 350);
 
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
