@@ -61,7 +61,7 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
     private double INTAKE_OFF_POWER = 0.0;
     private double intakePower = INTAKE_OFF_POWER;
 
-    private double FOOT_UP_POWER = 1.0;
+    private double FOOT_UP_POWER = 0.85;
     private double FOOT_DOWN_POWER = -0.85;
     private double FOOT_OFF_POWER = 0.0;
     private double footPower = FOOT_OFF_POWER;

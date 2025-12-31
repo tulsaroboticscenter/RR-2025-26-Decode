@@ -101,12 +101,6 @@ public class BlueAuto extends LinearOpMode {
 
     private FootMode footmode;
 
-    /*
-     * Code to run ONCE when the driver hits INIT (same as previous year's init())
-     */
-
-
-
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");

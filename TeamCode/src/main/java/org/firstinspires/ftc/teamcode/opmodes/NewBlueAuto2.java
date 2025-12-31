@@ -150,6 +150,22 @@ public class NewBlueAuto2 extends LinearOpMode {
         sleep(time);
     }
 
+    private void strafeLeft(double power, long time) {
+        leftFrontDrive.setPower(-power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(-power);
+        sleep(time);
+    }
+
+    private void strafeRight(double power, long time) {
+        leftFrontDrive.setPower(power);
+        rightFrontDrive.setPower(-power);
+        leftBackDrive.setPower(-power);
+        rightBackDrive.setPower(power);
+        sleep(time);
+    }
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -215,11 +231,15 @@ public class NewBlueAuto2 extends LinearOpMode {
             launchCatapult(10);
 
             // Back up to get artifacts
-            moveBackward(1,800);
+            moveBackward(1,700);
+            brake(100);
+
+            // Strafe to get artifacts
+            strafeLeft(1, 200);
             brake(100);
 
             // First rotate left
-            turnLeft(1, 225);
+            turnLeft(1, 175);
             brake(100);
 
             // Intake on
@@ -233,7 +253,11 @@ public class NewBlueAuto2 extends LinearOpMode {
             intake.setPower(0);
 
             // Back up for the goal
-            moveBackward(0.75, 1000);
+            moveBackward(0.75, 500);
+            brake(100);
+
+            // Strafe back
+            strafeRight(1, 450);
             brake(100);
 
             // Second rotate right
@@ -241,7 +265,7 @@ public class NewBlueAuto2 extends LinearOpMode {
             brake(100);
 
             // Move to the goal
-            moveForward(1, 950);
+            moveForward(1, 700);
             brake(500);
 
             // Rock stuck artifacts into the catapult
