@@ -52,7 +52,7 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
     private DcMotor intake = null;
     private DcMotorEx catapult1 = null;
     private DcMotorEx catapult2 = null;
-    private DcMotor foot = null;
+    private DcMotorEx foot = null;
 
     // motor power 1 = 100% and 0.5 = 50%
     // negative values = reverse ex: -0.5 = reverse 50%
@@ -100,13 +100,16 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
         intake = hardwareMap.get(DcMotor.class, "intake");
         catapult1 = hardwareMap.get(DcMotorEx.class, "catapult1");
         catapult2 = hardwareMap.get(DcMotorEx.class, "catapult2");
-        foot = hardwareMap.get(DcMotor.class, "foot");
+        foot = hardwareMap.get(DcMotorEx.class, "foot");
 
         catapult1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         catapult1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         
         catapult2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         catapult2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        foot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        foot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // set direction of wheel motors
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -196,13 +199,14 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
             // FOOT CODE
             if (footOutButton) {
                 footmode = FootMode.DOWN;
-                footPower = FOOT_DOWN_POWER;
+                foot.setTargetPosition(1180);
+                foot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             } else if (footUpButton) {
                 footmode = FootMode.UP;
-                footPower = FOOT_UP_POWER;
+                foot.setTargetPosition(0);
+                foot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             } else {
                 footmode = FootMode.BRAKE;
-                foot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
 
             // Determine pivot mode
@@ -234,7 +238,7 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
             rightBackDrive.setPower(rightBackPower);
 
             intake.setPower(intakePower);
-            foot.setPower(footPower);
+            // foot.setPower(footPower);
 
             // UPDATE TELEMETRY
             // Show the elapsed game time, wheel power, and other systems power
@@ -248,6 +252,7 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
             telemetry.addData("Catapult2 Current Draw: ", (catapult2MotorCurrent));
             telemetry.addData("Catapult 1 Encoder: ", catapult1.getCurrentPosition());
             telemetry.addData("Catapult 2 Encoder: ", catapult2.getCurrentPosition());
+            telemetry.addData("Foot Encoder: ", foot.getCurrentPosition());
             telemetry.addData("Catapult MODE", "%s", pivotMode);
             telemetry.update();
         }
