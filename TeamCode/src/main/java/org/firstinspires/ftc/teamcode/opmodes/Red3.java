@@ -54,8 +54,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Auto (3 artifact)", group="Auto")
-public class BlueAuto extends LinearOpMode {
+@Autonomous(name="Red Auto (3 artifact)", group="Auto")
+public class Red3 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -100,6 +100,12 @@ public class BlueAuto extends LinearOpMode {
     private enum FootMode {UP, DOWN, BRAKE}
 
     private FootMode footmode;
+
+    /*
+     * Code to run ONCE when the driver hits INIT (same as previous year's init())
+     */
+
+
 
     @Override
     public void runOpMode() {
@@ -177,7 +183,6 @@ public class BlueAuto extends LinearOpMode {
 
             sleep(250);
 
-
             // Stop the robot
             leftFrontDrive.setPower(0);
             rightFrontDrive.setPower(0);
@@ -203,10 +208,10 @@ public class BlueAuto extends LinearOpMode {
 
             // drive off the line
             // rotate 90 degrees
-            leftBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(-0.5);
-            rightFrontDrive.setPower(-0.5);
+            leftBackDrive.setPower(-0.5);
+            leftFrontDrive.setPower(-0.5);
+            rightBackDrive.setPower(0.5);
+            rightFrontDrive.setPower(0.5);
 
             sleep(1000);
 

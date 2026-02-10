@@ -61,11 +61,6 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
     private double INTAKE_OFF_POWER = 0.0;
     private double intakePower = INTAKE_OFF_POWER;
 
-    private double FOOT_UP_POWER = 0.85;
-    private double FOOT_DOWN_POWER = -0.85;
-    private double FOOT_OFF_POWER = 0.0;
-    private double footPower = FOOT_OFF_POWER;
-
     private double CATAPULT_UP_POWER = -1.0;
     private double CATAPULT_DOWN_POWER = 1.0;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
@@ -109,7 +104,9 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
         catapult2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         foot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        foot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        foot.setTargetPosition(0);
+        foot.setPower(0);
+        foot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // set direction of wheel motors
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -198,15 +195,11 @@ public class TeleOpControlLinearOpMode extends LinearOpMode {
 
             // FOOT CODE
             if (footOutButton) {
-                footmode = FootMode.DOWN;
                 foot.setTargetPosition(1180);
-                foot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                foot.setPower(0.85);
             } else if (footUpButton) {
-                footmode = FootMode.UP;
                 foot.setTargetPosition(0);
-                foot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            } else {
-                footmode = FootMode.BRAKE;
+                foot.setPower(0.85);
             }
 
             // Determine pivot mode

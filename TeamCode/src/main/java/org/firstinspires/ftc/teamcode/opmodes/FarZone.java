@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -55,9 +54,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Auto (9 artifact)", group="Auto")
-@Disabled
-public class NewBlueAuto9 extends LinearOpMode {
+@Autonomous(name="Far Zone Auto", group="Auto")
+public class FarZone extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -67,20 +65,27 @@ public class NewBlueAuto9 extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+
+    // Declare end-effector members
     private DcMotor intake = null;
     private DcMotorEx catapult1 = null;
     private DcMotorEx catapult2 = null;
     private DcMotor foot = null;
-    private double INTAKE_IN_POWER = 0.75;
+
+    // motor power 1 = 100% and 0.5 = 50%
+    // negative values = reverse ex: -0.5 = reverse 50%
+    private double INTAKE_IN_POWER = 1.0;
     private double INTAKE_OUT_POWER = -0.9;
     private double INTAKE_OFF_POWER = 0.0;
     private double intakePower = INTAKE_OFF_POWER;
+
     private double FOOT_UP_POWER = 1.0;
     private double FOOT_DOWN_POWER = -0.85;
     private double FOOT_OFF_POWER = 0.0;
     private double footPower = FOOT_OFF_POWER;
+
     private double CATAPULT_UP_POWER         = -1.0;
-    private double CATAPULT_DOWN_POWER       = 1.0;
+    private double CATAPULT_DOWN_POWER       = 0.5;
     private double CATAPULT_SET_TARGET_POWER = 0.75;
 
     private enum CatapultModes {
@@ -96,77 +101,11 @@ public class NewBlueAuto9 extends LinearOpMode {
 
     private FootMode footmode;
 
-    // Declare move functions
-    private void moveForward(double power, long time) {
-        leftFrontDrive.setPower(power);
-        rightFrontDrive.setPower(power);
-        leftBackDrive.setPower(power);
-        rightBackDrive.setPower(power);
-        sleep(time);
-    }
+    /*
+     * Code to run ONCE when the driver hits INIT (same as previous year's init())
+     */
 
-    private void moveBackward(double power, long time) {
-        leftFrontDrive.setPower(-power);
-        rightFrontDrive.setPower(-power);
-        leftBackDrive.setPower(-power);
-        rightBackDrive.setPower(-power);
-        sleep(time);
-    }
 
-    private void turnLeft(double power, long time) {
-        leftFrontDrive.setPower(-power);
-        rightFrontDrive.setPower(power);
-        leftBackDrive.setPower(-power);
-        rightBackDrive.setPower(power);
-        sleep(time);
-    }
-
-    private void turnRight(double power, long time) {
-        leftFrontDrive.setPower(power);
-        rightFrontDrive.setPower(-power);
-        leftBackDrive.setPower(power);
-        rightBackDrive.setPower(-power);
-        sleep(time);
-    }
-
-    private void brake(long time) {
-        leftFrontDrive.setPower(0);
-        rightFrontDrive.setPower(0);
-        leftBackDrive.setPower(0);
-        rightBackDrive.setPower(0);
-        sleep(time);
-    }
-
-    private void dropCatapult(long time) {
-        catapult1.setPower(CATAPULT_DOWN_POWER);
-        catapult2.setPower(CATAPULT_DOWN_POWER);
-        sleep(time);
-    }
-
-    private void launchCatapult(long time) {
-        catapult1.setPower(CATAPULT_UP_POWER);
-        catapult2.setPower(CATAPULT_UP_POWER);
-        sleep(500);
-        catapult1.setPower(0);
-        catapult2.setPower(0);
-        sleep(time);
-    }
-
-    private void strafeLeft(double power, long time) {
-        leftFrontDrive.setPower(power);
-        rightFrontDrive.setPower(-power);
-        leftBackDrive.setPower(-power);
-        rightBackDrive.setPower(power);
-        sleep(time);
-    }
-
-    private void strafeRight(double power, long time) {
-        leftFrontDrive.setPower(-power);
-        rightFrontDrive.setPower(power);
-        leftBackDrive.setPower(power);
-        rightBackDrive.setPower(-power);
-        sleep(time);
-    }
 
     @Override
     public void runOpMode() {
@@ -198,6 +137,18 @@ public class NewBlueAuto9 extends LinearOpMode {
         catapult2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         catapult2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        // ########################################################################################
+        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
+        // ########################################################################################
+        // Most robots need the motors on one side to be reversed
+        // to drive forward.
+        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
+        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
+        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
+        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
+        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
+        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
+
         // set direction of wheel motors
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -205,7 +156,7 @@ public class NewBlueAuto9 extends LinearOpMode {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // set direction of subsystem motors
-        intake.setDirection(DcMotor.Direction.REVERSE);
+        intake.setDirection(DcMotor.Direction.FORWARD); // Forward should INTAKE.
         catapult1.setDirection(DcMotor.Direction.FORWARD); // Backwards should pivot DOWN, or in the stowed position.
         catapult2.setDirection(DcMotor.Direction.REVERSE);
         foot.setDirection(DcMotor.Direction.REVERSE); // Backwards should should stay UP, or in the stowed position
@@ -224,106 +175,23 @@ public class NewBlueAuto9 extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            // Drive slightly away from the wall
-            moveBackward(0.5, 250);
-            brake(10);
+            // Drive off the line
+            leftFrontDrive.setPower(0.5);
+            rightFrontDrive.setPower(0.5);
+            leftBackDrive.setPower(0.5);
+            rightBackDrive.setPower(0.5);
 
-            // Launch preloaded artifacts
-            dropCatapult(1000);
-            launchCatapult(10);
+            // Wait
+            sleep(600);
 
-            // Back up to get artifacts
-            moveBackward(1,800);
-            brake(100);
+            // Stop everything
+            leftFrontDrive.setPower(0);
+            rightFrontDrive.setPower(0);
+            leftBackDrive.setPower(0);
+            rightBackDrive.setPower(0);
 
-            // First rotate left
-            turnLeft(1, 225);
-            brake(100);
-
-            // Intake on
-            intake.setPower(0.75);
-
-            // Go towards the artifacts
-            moveForward(0.75, 1100);
-            brake(2000);
-
-            // Intake off
-            intake.setPower(0);
-
-            // Back up for the goal
-            moveBackward(0.75, 900);
-            brake(100);
-
-            // Second rotate right
-            turnRight(1, 180);
-            brake(100);
-
-            // Move to the goal
-            moveForward(1, 850);
-            brake(500);
-
-            // Rock stuck artifacts into the catapult
-            intake.setPower(0.9);
-            moveBackward(0.75, 250);
-            brake(250);
-            moveForward(0.75, 250);
-            brake(250);
-            intake.setPower(0);
-
-            // Launch artifacts
-            dropCatapult(1000);
-            launchCatapult(10);
-
-            // Back up to get artifacts
-            moveBackward(1,800);
-            brake(100);
-
-            // First rotate left and strafe right
-            turnLeft(1, 200);
-            brake(100);
-            strafeRight(1, 475);
-            brake(100);
-
-            // Intake on
-            intake.setPower(0.85);
-
-            // Go towards the artifacts
-            moveForward(0.75, 1150);
-            brake(2000);
-
-            // Intake off
-            intake.setPower(0);
-
-            // Back up for the goal
-            moveBackward(0.75, 1000);
-            brake(100);
-
-            // Second rotate right and strafe left
-            turnRight(1, 200);
-            brake(100);
-            strafeLeft(1, 525);
-            brake(100);
-
-            // Move to the goal
-            moveForward(1, 1100);
-            brake(500);
-
-            // Rock stuck artifacts into the catapult
-            intake.setPower(0.9);
-            moveBackward(0.75, 250);
-            brake(250);
-            moveForward(0.75, 250);
-            brake(250);
-            intake.setPower(0);
-
-            // Launch artifacts
-            dropCatapult(1000);
-            launchCatapult(10);
-
-            // End the operation
             telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.seconds());
             telemetry.update();
-
             requestOpModeStop();
         }
 
