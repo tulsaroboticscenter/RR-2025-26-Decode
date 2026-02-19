@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import static java.lang.Thread.sleep;
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -16,8 +14,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Blue - Six", group = "Auto")
-public class Blue6_PATHING extends OpMode {
+@Autonomous(name = "Red - Nine", group = "Auto")
+public class Red9_PATHING extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
@@ -25,15 +23,18 @@ public class Blue6_PATHING extends OpMode {
     private int pathState;
 
     // declare poses for robot path points
-    private final Pose startPose = new Pose(20, 123, Math.toRadians(144));
-    private final Pose scorePose = new Pose(23, 121, Math.toRadians(144));
-    private final Pose pickup1Pose = new Pose(55, 82, Math.toRadians(180));
-    private final Pose collect1Pose = new Pose(23, 82, Math.toRadians(180));
-    private final Pose finalScorePose = new Pose(26,119, Math.toRadians(144));
+    private final Pose startPose = new Pose(123, 123, Math.toRadians(35));
+    private final Pose scorePose = new Pose(121, 121, Math.toRadians(35));
+    private final Pose pickup1Pose = new Pose(94,83, Math.toRadians(0));
+    private final Pose collect1Pose = new Pose(128, 83, Math.toRadians(0));
+    private final Pose pickup2Pose = new Pose(94, 58, Math.toRadians(0));
+    private final Pose collect2Pose = new Pose(133, 58, Math.toRadians(0));
+    private final Pose finalScorePose = new Pose(119,119, Math.toRadians(35));
+
 
     // initialize paths
     private Path scorePreload;
-    private PathChain grabPickup1, collectPickup1, scorePickup1, leaveLine; // for other autos, add more paths
+    private PathChain grabPickup1, collectPickup1, scorePickup1, grabPickup2, collectPickup2, moveBack2, scorePickup2, frontGate, hitGate, leaveLine; // for other autos, add more paths
 
     public void buildPaths() {
         // score preload path
@@ -53,6 +54,26 @@ public class Blue6_PATHING extends OpMode {
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(collect1Pose, finalScorePose))
                 .setLinearHeadingInterpolation(collect1Pose.getHeading(), finalScorePose.getHeading())
+                .build();
+
+        grabPickup2 = follower.pathBuilder()
+                .addPath(new BezierLine(finalScorePose, pickup2Pose))
+                .setLinearHeadingInterpolation(finalScorePose.getHeading(), pickup2Pose.getHeading())
+                .build();
+
+        collectPickup2 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup2Pose, collect2Pose))
+                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), collect2Pose.getHeading())
+                .build();
+
+        moveBack2 = follower.pathBuilder()
+                .addPath(new BezierLine(collect2Pose, pickup2Pose))
+                .setLinearHeadingInterpolation(collect2Pose.getHeading(), pickup2Pose.getHeading())
+                .build();
+
+        scorePickup2 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup2Pose, finalScorePose))
+                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), finalScorePose.getHeading())
                 .build();
 
         leaveLine = follower.pathBuilder()
@@ -75,14 +96,12 @@ public class Blue6_PATHING extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
                     catapult1.setPower(-1);
                     catapult2.setPower(-1);
-                    telemetry.addLine("Catapult launched.");
 
                     setPathState(2);
                 }
                 break;
             case 2:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
-                    // follow the next path
                     follower.followPath(grabPickup1, true);
                     setPathState(3);
                 }
@@ -90,7 +109,6 @@ public class Blue6_PATHING extends OpMode {
             case 3:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2) {
                     intake.setPower(1);
-                    telemetry.addLine("Intake activated.");
 
                     follower.followPath(collectPickup1, true);
                     setPathState(4);
@@ -107,21 +125,59 @@ public class Blue6_PATHING extends OpMode {
                 break;
             case 5:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
-                    // SCORE ARTIFACTS
                     intake.setPower(0);
+
                     catapult1.setPower(-1);
                     catapult2.setPower(-1);
-                    telemetry.addLine("Add the code to shoot the catapult.");
+
                     setPathState(6);
                 }
                 break;
             case 6:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
-                    follower.followPath(leaveLine, true);
+                    follower.followPath(grabPickup2, true);
                     setPathState(7);
                 }
                 break;
             case 7:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2) {
+                    intake.setPower(1);
+
+                    follower.followPath(collectPickup2, true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 2) {
+                    follower.followPath(moveBack2, true);
+                    setPathState(9);
+                }
+                break;
+            case 9:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                    catapult1.setPower(1);
+                    catapult2.setPower(1);
+
+                    follower.followPath(scorePickup2, true);
+                    setPathState(10);
+                }
+                break;
+            case 10:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                    intake.setPower(0);
+                    catapult1.setPower(-1);
+                    catapult2.setPower(-1);
+
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                    follower.followPath(leaveLine, true);
+                    setPathState(12);
+                }
+                break;
+            case 12:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
                     requestOpModeStop();
                 }

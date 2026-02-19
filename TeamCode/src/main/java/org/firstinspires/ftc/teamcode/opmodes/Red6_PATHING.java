@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Red - Six - Pedro", group = "Auto")
+@Autonomous(name = "Red - Six", group = "Auto")
 public class Red6_PATHING extends OpMode {
 
     private Follower follower;
@@ -119,6 +119,10 @@ public class Red6_PATHING extends OpMode {
                     setPathState(7);
                 }
                 break;
+            case 7:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                    requestOpModeStop();
+                }
         }
     }
 

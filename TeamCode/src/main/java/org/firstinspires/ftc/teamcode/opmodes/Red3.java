@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Auto (3 artifact)", group="Auto")
+@Autonomous(name="Red - Three", group="Auto")
 public class Red3 extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
